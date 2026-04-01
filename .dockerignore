@@ -1,0 +1,6 @@
+# Ignore the Docker build context
+**/*.log
+**/*.tmp
+**/node_modules/
+**/*.md
+**/*.git/
