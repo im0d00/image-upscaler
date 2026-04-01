@@ -1,0 +1,17 @@
+version: '3.8'  
+services:  
+  upscaler:  
+    image: your_image_name  
+    runtime: nvidia  
+    environment:  
+      - NVIDIA_VISIBLE_DEVICES=all  
+    volumes:  
+      - ./data:/data  
+    deploy:  
+      replicas: 1  
+      resources:  
+        reservations:  
+          devices:  
+            - driver: nvidia  
+              count: all  
+              capabilities: [gpu]  
