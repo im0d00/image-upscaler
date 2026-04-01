@@ -1,0 +1,26 @@
+# Dockerfile for GPU-Accelerated Image Upscaling
+
+# Use NVIDIA’s CUDA base image
+FROM nvidia/cuda:11.4.2-cudnn8-runtime-ubuntu20.04
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the requirements file
+COPY requirements.txt .
+
+# Install necessary packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3 \
+        python3-pip \
+        && \
+    pip3 install --no-cache-dir -r requirements.txt \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the application files
+COPY . .
+
+# Specify the command to run the application
+CMD ["python3", "upscale.py"]
