@@ -1,0 +1,1 @@
+version: '3.8'\nservices:\n  upscaler:\n    image: im0d00/image-upscaler:latest\n    container_name: image_upscaler_cpu\n    deploy:\n      resources:\n        limits:\n          cpus: '1.0'\n          memory: 512M\n    ports:\n      - '5000:5000'\n    restart: always\n    environment:\n      - ENV=production\n      - CPU_MODE=true\n
