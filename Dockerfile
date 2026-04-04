@@ -25,4 +25,4 @@ WORKDIR /app
 COPY --from=builder /app .
 
 # Command to run the application
-CMD ["python", "upscaler.py"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
