@@ -4,6 +4,7 @@
 - [Features](#features)
 - [Architecture](#architecture)
 - [Installation](#installation)
+- [Deployment](#deployment)
 - [API Documentation](#api-documentation)
 - [Troubleshooting Guide](#troubleshooting-guide)
 
@@ -38,28 +39,79 @@ pip install -r requirements.txt  # for Python projects
 # or
 npm install  # for Node.js projects
 ```
-3. **Run the application:**  
+3. **Run the application:**
 ```bash
-python app.py  # for Python apps
+uvicorn main:app --reload  # Development mode
 # or
-node app.js  # for Node.js apps
+python main.py  # Production mode
+```
+
+## Deployment
+
+### Vercel Deployment
+This application is ready for deployment on Vercel:
+
+1. **Install Vercel CLI:**
+```bash
+npm install -g vercel
+```
+
+2. **Deploy to Vercel:**
+```bash
+vercel
+```
+
+3. **Environment Variables:**
+Configure any necessary environment variables in your Vercel project settings.
+
+The application uses:
+- `vercel.json` for Vercel configuration
+- `api/index.py` as the serverless function entry point
+- FastAPI with automatic OpenAPI documentation at `/docs`
+
+### Docker Deployment
+Alternatively, you can deploy using Docker:
+```bash
+docker-compose up
 ```
 
 ## API Documentation
 ### Endpoints
-- **POST /upscale**  
-  - Description: Upload an image for upscaling.
-  - Parameters:  
-    - `image` (file): The image file to be upscaled.
 
-- **GET /status**  
-  - Description: Check the status of the upscaling process.
-  - Response: Returns the processing status.
+- **GET /health**
+  - Description: Health check endpoint.
+  - Response: `{"status": "ok"}`
+
+- **POST /upload**
+  - Description: Upload an image file for processing.
+  - Parameters:
+    - `file` (file): The image file to be uploaded.
+  - Response: `{"upload_id": "uuid", "filename": "image.jpg"}`
+
+- **POST /tasks/{upload_id}/start**
+  - Description: Start processing an uploaded image.
+  - Response: `{"upload_id": "uuid", "status": "processing"}`
+
+- **GET /tasks/{upload_id}**
+  - Description: Check the status of a processing task.
+  - Response: `{"upload_id": "uuid", "status": "processing", "filename": "image.jpg"}`
 
 ### Example Request
 ```bash
-curl -X POST -F "image=@/path/to/image.jpg" http://localhost:5000/upscale
+# Upload an image
+curl -X POST -F "file=@/path/to/image.jpg" http://localhost:8000/upload
+
+# Start processing
+curl -X POST http://localhost:8000/tasks/{upload_id}/start
+
+# Check status
+curl http://localhost:8000/tasks/{upload_id}
 ```
+
+### Interactive API Documentation
+Once the application is running, visit:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
 ## Troubleshooting Guide
 - **Issue:** Application fails to start.  
