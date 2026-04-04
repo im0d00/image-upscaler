@@ -26,14 +26,14 @@ async def health_check():
 async def upload_file(file: UploadFile = File(...)):
     """Upload an image file for processing"""
     if not file:
-        raise HTTPException(status_code=400, detail={"error": "No file provided"})
+        raise HTTPException(status_code=400, detail="No file provided")
 
     # Validate file extension
     file_ext = Path(file.filename).suffix.lower()
     if file_ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=400,
-            detail={"error": f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"}
+            detail=f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
         )
 
     # Generate unique upload ID
@@ -60,7 +60,7 @@ async def upload_file(file: UploadFile = File(...)):
 async def start_task(upload_id: str):
     """Start processing an uploaded image"""
     if upload_id not in tasks:
-        raise HTTPException(status_code=404, detail={"error": "Upload not found"})
+        raise HTTPException(status_code=404, detail="Upload not found")
 
     tasks[upload_id]["status"] = "processing"
 
@@ -77,7 +77,7 @@ async def start_task(upload_id: str):
 async def get_task_status(upload_id: str):
     """Get the status of a processing task"""
     if upload_id not in tasks:
-        raise HTTPException(status_code=404, detail={"error": "Task not found"})
+        raise HTTPException(status_code=404, detail="Task not found")
 
     return {
         "upload_id": upload_id,
@@ -86,21 +86,12 @@ async def get_task_status(upload_id: str):
     }
 
 
-@app.exception_handler(404)
-async def not_found_handler(request, exc):
-    """Handle 404 errors"""
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    """Handle HTTP exceptions"""
     return JSONResponse(
-        status_code=404,
-        content={"error": "Not found"}
-    )
-
-
-@app.exception_handler(400)
-async def bad_request_handler(request, exc):
-    """Handle 400 errors"""
-    return JSONResponse(
-        status_code=400,
-        content={"error": "Bad request"}
+        status_code=exc.status_code,
+        content={"error": exc.detail}
     )
 
 
